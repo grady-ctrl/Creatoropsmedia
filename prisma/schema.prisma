@@ -1,0 +1,477 @@
+// Prisma schema for Creator Ops Division Dashboard
+// Copyright Syndicate Holdings Group LLC - Spartanburg, SC
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  CREATOR
+  FINANCE
+}
+
+enum CreatorStage {
+  LEAD
+  APPLIED
+  ONBOARDING
+  ACTIVE
+  PAUSED
+  OFFBOARDED
+}
+
+enum KYCStatus {
+  NOT_STARTED
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum PayoutStatus {
+  DUE
+  PROCESSING
+  PAID
+  HOLD
+  CANCELLED
+}
+
+enum PayoutMethod {
+  WISE
+  PAYPAL
+  ZELLE
+  BANK_TRANSFER
+  OTHER
+}
+
+enum TaskStatus {
+  OPEN
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketStatus {
+  OPEN
+  PENDING
+  RESOLVED
+  ESCALATED
+  CLOSED
+}
+
+enum TicketChannel {
+  DISCORD
+  EMAIL
+  FORM
+  LARK
+  OTHER
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ComplianceEventType {
+  KYC
+  AGE_VERIFICATION
+  CONTENT_FLAG
+  BAN_RISK
+  PLATFORM_WARNING
+  GUIDELINE_VIOLATION
+  OTHER
+}
+
+enum ComplianceSeverity {
+  INFO
+  WARNING
+  CRITICAL
+  BLOCKING
+}
+
+enum ComplianceStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  ESCALATED
+}
+
+// NextAuth models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Core user model
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  role          Role      @default(CREATOR)
+  managerId     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+
+  manager        Manager?
+  creatorProfile Creator?
+  managedBy      User?    @relation("UserManager", fields: [managerId], references: [id])
+  manages        User[]   @relation("UserManager")
+
+  assignedTasks  Task[]        @relation("TaskAssignee")
+  auditLogs      AuditLog[]
+  assignedTickets Ticket[]     @relation("TicketAssignee")
+
+  @@index([role])
+  @@index([managerId])
+  @@index([email])
+}
+
+// Manager profile extension
+model Manager {
+  id          String  @id @default(cuid())
+  userId      String  @unique
+  displayName String
+  timezone    String  @default("America/New_York")
+  notes       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  creators Creator[]
+
+  @@index([userId])
+}
+
+// Creator profile
+model Creator {
+  id                   String        @id @default(cuid())
+  stage                CreatorStage  @default(LEAD)
+  handle               String        @unique
+  displayName          String?
+  region               String?
+  tiktokUserId         String?       @unique
+  joinDate             DateTime?
+  managerId            String?
+  referralCode         String        @unique @default(cuid())
+  referredByCreatorId  String?
+  discordId            String?
+  discordUsername      String?
+  larkChatId           String?
+  email                String?
+  phone                String?
+  tags                 String[]      @default([])
+  riskLevel            RiskLevel     @default(LOW)
+  kycStatus            KYCStatus     @default(NOT_STARTED)
+  notes                String?
+
+  lastLiveAt           DateTime?
+  lastContactAt        DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  manager           Manager?           @relation(fields: [managerId], references: [id])
+  referredBy        Creator?           @relation("CreatorReferrals", fields: [referredByCreatorId], references: [id])
+  referrals         Creator[]          @relation("CreatorReferrals")
+
+  liveStats         LiveStat[]
+  payouts           Payout[]
+  referralsGiven    Referral[]         @relation("ReferrerCreator")
+  referralsReceived Referral[]         @relation("ReferredCreator")
+  tasks             Task[]
+  tickets           Ticket[]
+  complianceEvents  ComplianceEvent[]
+  notionSyncs       NotionSyncState[]
+  auditLogs         AuditLog[]         @relation("CreatorAuditLogs")
+
+  @@index([stage])
+  @@index([region])
+  @@index([managerId])
+  @@index([referredByCreatorId])
+  @@index([kycStatus])
+  @@index([riskLevel])
+  @@index([handle])
+  @@index([tiktokUserId])
+}
+
+// Daily livestream statistics
+model LiveStat {
+  id             String   @id @default(cuid())
+  creatorId      String
+  date           DateTime @db.Date
+  liveMinutes    Int      @default(0)
+  averageViewers Int      @default(0)
+  peakViewers    Int      @default(0)
+  diamonds       Int      @default(0)
+  giftsCount     Int      @default(0)
+  revenueUSD     Float    @default(0)
+  ctr            Float?
+  retention      Float?
+  notes          String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  creator Creator @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@unique([creatorId, date])
+  @@index([creatorId])
+  @@index([date])
+  @@index([revenueUSD])
+  @@index([diamonds])
+}
+
+// Payout records
+model Payout {
+  id          String        @id @default(cuid())
+  creatorId   String
+  periodStart DateTime      @db.Date
+  periodEnd   DateTime      @db.Date
+  diamonds    Int           @default(0)
+  revenueUSD  Float         @default(0)
+  feeUSD      Float         @default(0)
+  bonusUSD    Float         @default(0)
+  netUSD      Float         @default(0)
+  status      PayoutStatus  @default(DUE)
+  method      PayoutMethod  @default(WISE)
+  reference   String?
+  notes       String?
+
+  paidAt    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  creator     Creator             @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  notionSyncs NotionSyncState[]
+
+  @@unique([creatorId, periodStart, periodEnd])
+  @@index([creatorId])
+  @@index([status])
+  @@index([periodStart])
+  @@index([periodEnd])
+}
+
+// Referral tracking
+model Referral {
+  id                String    @id @default(cuid())
+  referrerCreatorId String
+  referredCreatorId String
+  date              DateTime  @default(now())
+  qualified         Boolean   @default(false)
+  qualifiedAt       DateTime?
+  bonusUSD          Float     @default(0)
+  notes             String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  referrer Creator @relation("ReferrerCreator", fields: [referrerCreatorId], references: [id], onDelete: Cascade)
+  referred Creator @relation("ReferredCreator", fields: [referredCreatorId], references: [id], onDelete: Cascade)
+
+  @@unique([referrerCreatorId, referredCreatorId])
+  @@index([referrerCreatorId])
+  @@index([referredCreatorId])
+  @@index([qualified])
+}
+
+// Task management
+model Task {
+  id                String       @id @default(cuid())
+  assigneeManagerId String?
+  creatorId         String?
+  type              String
+  title             String
+  description       String?
+  status            TaskStatus   @default(OPEN)
+  priority          TaskPriority @default(MEDIUM)
+  dueAt             DateTime?
+  checklist         Json?
+  metadata          Json?
+
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  assignee User?    @relation("TaskAssignee", fields: [assigneeManagerId], references: [id])
+  creator  Creator? @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@index([assigneeManagerId])
+  @@index([creatorId])
+  @@index([status])
+  @@index([priority])
+  @@index([dueAt])
+}
+
+// Support ticket system
+model Ticket {
+  id                String         @id @default(cuid())
+  creatorId         String
+  channel           TicketChannel  @default(FORM)
+  subject           String
+  status            TicketStatus   @default(OPEN)
+  priority          TicketPriority @default(MEDIUM)
+  assignedManagerId String?
+  messages          Json           @default("[]")
+  metadata          Json?
+
+  resolvedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  creator Creator @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  assignee User?  @relation("TicketAssignee", fields: [assignedManagerId], references: [id])
+
+  @@index([creatorId])
+  @@index([status])
+  @@index([priority])
+  @@index([assignedManagerId])
+  @@index([createdAt])
+}
+
+// Compliance event tracking
+model ComplianceEvent {
+  id        String                @id @default(cuid())
+  creatorId String
+  type      ComplianceEventType
+  severity  ComplianceSeverity
+  status    ComplianceStatus      @default(OPEN)
+  title     String
+  details   String?
+  metadata  Json?
+
+  resolvedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  creator Creator @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@index([creatorId])
+  @@index([type])
+  @@index([severity])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Audit log for all changes
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  entity    String
+  entityId  String
+  creatorId String?
+  before    Json?
+  after     Json?
+  metadata  Json?
+  ipAddress String?
+  userAgent String?
+
+  createdAt DateTime @default(now())
+
+  user    User?    @relation(fields: [userId], references: [id])
+  creator Creator? @relation("CreatorAuditLogs", fields: [creatorId], references: [id])
+
+  @@index([userId])
+  @@index([entity, entityId])
+  @@index([creatorId])
+  @@index([createdAt])
+  @@index([action])
+}
+
+// Notion sync state tracking
+model NotionSyncState {
+  id           String    @id @default(cuid())
+  entity       String
+  entityId     String
+  notionPageId String
+  lastSyncedAt DateTime  @default(now())
+
+  creatorId String?
+  payoutId  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  creator Creator? @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  payout  Payout?  @relation(fields: [payoutId], references: [id], onDelete: Cascade)
+
+  @@unique([entity, entityId])
+  @@index([entity])
+  @@index([notionPageId])
+  @@index([creatorId])
+  @@index([payoutId])
+}
+
+// App settings and configuration
+model AppSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+}
