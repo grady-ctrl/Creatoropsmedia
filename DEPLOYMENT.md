@@ -201,7 +201,7 @@ EMAIL_FROM=noreply@creatorops.us
    - Should show sign-in page
 
 2. **Test Authentication**
-   - Enter `admin@creatorops.us`
+   - Enter `grady@creatorops.us`
    - Check email for magic link
    - Should redirect to dashboard
 

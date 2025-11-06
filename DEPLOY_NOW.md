@@ -48,7 +48,7 @@ pnpm db:push
 pnpm db:seed
 ```
 
-**Done! 🎉** Visit your Vercel URL and sign in with: `admin@creatorops.us`
+**Done! 🎉** Visit your Vercel URL and sign in with: `grady@creatorops.us`
 
 ---
 
@@ -141,7 +141,7 @@ Can't find the deploy button? Here's the exact path:
 
 After deployment + seeding, test these:
 
-✅ **Auth**: Sign in with `admin@creatorops.us`
+✅ **Auth**: Sign in with `grady@creatorops.us`
 ✅ **Overview**: See KPIs and charts with data
 ✅ **Creators**: Browse 25 seeded creators
 ✅ **Live Ops**: Check today's leaderboard

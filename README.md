@@ -143,7 +143,7 @@ pnpm db:seed
 ```
 
 **Seed Data Includes:**
-- 1 Admin user: `admin@creatorops.us`
+- 1 Admin user: `grady@creatorops.us`
 - 1 Finance user: `finance@creatorops.us`
 - 4 Manager users
 - 25 Creators across all lifecycle stages
@@ -167,7 +167,7 @@ pnpm worker
 ### 5. View Demo Data
 
 Navigate to `http://localhost:3000` and sign in using magic link with:
-- `admin@creatorops.us` (Admin access)
+- `grady@creatorops.us` (Admin access)
 - `sarah@creatorops.us` (Manager access)
 - `finance@creatorops.us` (Finance access)
 

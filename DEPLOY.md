@@ -31,7 +31,7 @@ pnpm db:seed
 
 ### 4. Access Your Dashboard
 
-Visit your Vercel URL and sign in with: `admin@creatorops.us`
+Visit your Vercel URL and sign in with: `grady@creatorops.us`
 
 ---
 

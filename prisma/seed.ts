@@ -57,8 +57,8 @@ async function main() {
   console.log('👤 Creating admin user...');
   const adminUser = await prisma.user.create({
     data: {
-      email: 'admin@creatorops.us',
-      name: 'Admin User',
+      email: 'grady@creatorops.us',
+      name: 'Grady',
       role: Role.ADMIN,
       emailVerified: new Date(),
     },
@@ -588,7 +588,7 @@ async function main() {
   console.log(`   Compliance Events: ${complianceCount}`);
   console.log('═══════════════════════════════════════════\n');
   console.log('🔐 Login credentials:');
-  console.log('   Admin:   admin@creatorops.us');
+  console.log('   Admin:   grady@creatorops.us');
   console.log('   Finance: finance@creatorops.us');
   console.log('   Manager: sarah@creatorops.us');
   console.log('\n💡 Use magic link auth in development\n');
