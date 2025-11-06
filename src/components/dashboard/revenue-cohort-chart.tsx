@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-export function RevenueByC ohortChart() {
+export function RevenueByCohortChart() {
   return (
     <Card>
       <CardHeader>

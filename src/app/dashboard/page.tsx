@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { OverviewKPIs } from '@/components/dashboard/overview-kpis';
 import { DiamondsChart } from '@/components/dashboard/diamonds-chart';
 import { LiveMinutesChart } from '@/components/dashboard/live-minutes-chart';
-import { RevenueByC ohortChart } from '@/components/dashboard/revenue-cohort-chart';
 import { AlertsPanel } from '@/components/dashboard/alerts-panel';
 import { QuickActions } from '@/components/dashboard/quick-actions';
 import { TopCreatorsTable } from '@/components/dashboard/top-creators-table';
