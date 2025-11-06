@@ -24,9 +24,9 @@ export default async function ReferralsPage() {
   });
 
   const leaderboard = await db.creator.findMany({
-    where: { referrals: { some: {} } },
+    where: { referralsGiven: { some: {} } },
     include: {
-      referrals: {
+      referralsGiven: {
         where: { qualified: true },
       },
     },
@@ -36,8 +36,8 @@ export default async function ReferralsPage() {
   const topReferrers = leaderboard
     .map(c => ({
       ...c,
-      referralCount: c.referrals.length,
-      totalBonus: c.referrals.reduce((sum, r) => sum + r.bonusUSD, 0),
+      referralCount: c.referralsGiven.length,
+      totalBonus: c.referralsGiven.reduce((sum, r) => sum + r.bonusUSD, 0),
     }))
     .sort((a, b) => b.referralCount - a.referralCount);
 
