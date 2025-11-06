@@ -22,38 +22,41 @@ interface SearchParams {
 export default async function CreatorsPage({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }) {
   await requireRole(['ADMIN', 'MANAGER']);
+
+  // Await searchParams in Next.js 15
+  const params = await searchParams;
 
   // Build where clause based on filters
   const where: any = {};
 
-  if (searchParams.stage) {
-    where.stage = searchParams.stage as CreatorStage;
+  if (params.stage) {
+    where.stage = params.stage as CreatorStage;
   }
 
-  if (searchParams.region) {
-    where.region = searchParams.region;
+  if (params.region) {
+    where.region = params.region;
   }
 
-  if (searchParams.manager) {
-    where.managerId = searchParams.manager;
+  if (params.manager) {
+    where.managerId = params.manager;
   }
 
-  if (searchParams.risk) {
-    where.riskLevel = searchParams.risk as RiskLevel;
+  if (params.risk) {
+    where.riskLevel = params.risk as RiskLevel;
   }
 
-  if (searchParams.kyc) {
-    where.kycStatus = searchParams.kyc as KYCStatus;
+  if (params.kyc) {
+    where.kycStatus = params.kyc as KYCStatus;
   }
 
-  if (searchParams.search) {
+  if (params.search) {
     where.OR = [
-      { handle: { contains: searchParams.search, mode: 'insensitive' as const } },
-      { displayName: { contains: searchParams.search, mode: 'insensitive' as const } },
-      { email: { contains: searchParams.search, mode: 'insensitive' as const } },
+      { handle: { contains: params.search, mode: 'insensitive' as const } },
+      { displayName: { contains: params.search, mode: 'insensitive' as const } },
+      { email: { contains: params.search, mode: 'insensitive' as const } },
     ];
   }
 
