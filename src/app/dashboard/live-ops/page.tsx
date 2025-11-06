@@ -72,14 +72,14 @@ export default async function LiveOpsPage() {
           Live Operations
         </h1>
         <p className="text-muted-foreground">
-          Real-time monitoring and today's leaderboard
+          Real-time monitoring and today&apos;s leaderboard
         </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Today's Live Minutes</CardTitle>
+            <CardTitle className="text-sm font-medium">Today&apos;s Live Minutes</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatDuration(totalLiveMinutes)}</div>
@@ -88,7 +88,7 @@ export default async function LiveOpsPage() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Today's Diamonds</CardTitle>
+            <CardTitle className="text-sm font-medium">Today&apos;s Diamonds</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatNumber(totalDiamonds)}</div>
@@ -110,7 +110,7 @@ export default async function LiveOpsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5" />
-              Today's Leaderboard
+              Today&apos;s Leaderboard
             </CardTitle>
             <CardDescription>Top performers by diamonds earned</CardDescription>
           </CardHeader>
