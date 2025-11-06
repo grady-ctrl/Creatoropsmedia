@@ -174,7 +174,6 @@ model User {
   sessions Session[]
 
   manager        Manager?
-  creatorProfile Creator?
   managedBy      User?    @relation("UserManager", fields: [managerId], references: [id])
   manages        User[]   @relation("UserManager")
 
