@@ -83,5 +83,10 @@
   },
   "engines": {
     "node": ">=18.17.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@auth/core": "0.41.1"
+    }
   }
 }
