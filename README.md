@@ -26,6 +26,21 @@ A comprehensive, secure, multi-role dashboard for operating a TikTok LIVE creato
 
 ---
 
+## ⚡ Quick Deploy
+
+### Deploy to Vercel in 3 Steps
+
+1. **Set up a free database at [Neon.tech](https://neon.tech)**
+2. **Click this button:**
+
+   [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+
+3. **Add your database URL and deploy!**
+
+📖 **Full deployment guide**: See [DEPLOYMENT.md](./DEPLOYMENT.md)
+
+---
+
 ## 🛠️ Tech Stack
 
 - **Frontend**: Next.js 15 (App Router), TypeScript, TailwindCSS, shadcn/ui
